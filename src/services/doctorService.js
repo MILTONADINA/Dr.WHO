@@ -1,12 +1,10 @@
 const { Doctor, Actor, Episode } = require('../models');
 
 class DoctorService {
-  // Create
   async createDoctor(data) {
     return await Doctor.create(data);
   }
 
-  // Read - Get all
   async getAllDoctors() {
     return await Doctor.findAll({
       include: [
@@ -17,7 +15,6 @@ class DoctorService {
     });
   }
 
-  // Read - Get by ID
   async getDoctorById(id) {
     return await Doctor.findByPk(id, {
       include: [
@@ -28,7 +25,6 @@ class DoctorService {
     });
   }
 
-  // Update
   async updateDoctor(id, data) {
     const doctor = await Doctor.findByPk(id);
     if (!doctor) {
@@ -37,7 +33,6 @@ class DoctorService {
     return await doctor.update(data);
   }
 
-  // Delete
   async deleteDoctor(id) {
     const doctor = await Doctor.findByPk(id);
     if (!doctor) {

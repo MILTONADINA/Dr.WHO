@@ -4,17 +4,17 @@
 **Topic:** Doctor Who Wiki Database
 **Group Members:** Jonathan Muhire, Milton Adina, Magnani Fabiola
 
-## Project Overview
+## Overview
 
-This project implements a comprehensive Doctor Who database system based on the TARDIS Wiki (https://tardis.fandom.com/wiki/Doctor_Who_Wiki). The system includes a MySQL database with 16 tables, an Express.js REST API, and a frontend interface with CRUD operations and natural language query capabilities.
+A Doctor Who database system with 16 tables, REST API, and web interface. Built for CMSC 4323 final project.
 
 ## Tech Stack
 
 - **Backend:** Node.js, Express.js
 - **ORM:** Sequelize
 - **Database:** MySQL
-- **Frontend:** HTML, CSS, JavaScript (Vanilla)
-- **LLM Integration:** OpenAI API (for extra credit)
+- **Frontend:** HTML, CSS, JavaScript 
+- **LLM Integration:** OpenAI API 
 
 ## Project Structure
 
@@ -46,18 +46,18 @@ This project implements a comprehensive Doctor Who database system based on the 
 The database consists of 16 tables:
 
 ### Core Tables
-- **ACTORS** - Actor information
-- **WRITERS** - Writer/showrunner information
-- **DIRECTORS** - Director information
-- **SEASONS** - Season information
-- **EPISODES** - Episode details
-- **DOCTOR** - Doctor incarnations
-- **COMPANIONS** - Companion characters
-- **CHARACTER** - General characters
-- **TARDIS** - TARDIS information
-- **PLANETS** - Planet locations
-- **ENEMIES** - Enemy characters
-- **SPECIES** - Species information
+- ACTORS - Actor information
+- WRITERS - Writer/showrunner information
+- DIRECTORS - Director information
+- SEASONS - Season information
+- EPISODES - Episode details
+- DOCTOR - Doctor incarnations
+- COMPANIONS - Companion characters
+- CHARACTER - General characters
+- TARDIS- TARDIS information
+- PLANETS- Planet locations
+- ENEMIES - Enemy characters
+- SPECIES - Species information
 
 ### Junction Tables
 - **DOCTOR_COMPANIONS** - Many-to-many: Doctors ↔ Companions
@@ -67,28 +67,21 @@ The database consists of 16 tables:
 
 ## Setup Instructions
 
-### Prerequisites
+### What You Need
 
-- Node.js (v14 or higher)
-- MySQL (v8.0 or higher)
-- MySQL Workbench (optional, for database management)
+- Node.js (v14+)
+- MySQL (v8.0+)
+- MySQL Workbench (optional)
 
-### 1. Clone the Repository
-
-```bash
-git clone <repository-url>
-cd "databases final project"
-```
-
-### 2. Install Dependencies
+### 1. Install Dependencies
 
 ```bash
 npm install
 ```
 
-### 3. Configure Environment Variables
+### 2. Setup Environment
 
-Create a `.env` file in the root directory by copying the example file:
+Create `.env` file:
 
 ```bash
 cp .env.example .env
@@ -107,59 +100,40 @@ NODE_ENV=development
 OPENAI_API_KEY=your_openai_api_key_here  # For extra credit 7b
 ```
 
-### 4. Create MySQL Database
+### 3. Create Database
 
-Open MySQL Workbench or MySQL command line and create the database:
+In MySQL:
 
 ```sql
 CREATE DATABASE doctor_who_db;
 ```
 
-### 5. Sync Database Schema
-
-This will create all tables, constraints, and indexes:
+### 4. Setup Tables
 
 ```bash
 npm run db:sync
 ```
 
-### 6. Create Views and Stored Procedures
-
-Run the SQL file using the provided script:
+### 5. Create Views and Procedures
 
 ```bash
 npm run db:objects
 ```
 
-Or manually in MySQL Workbench:
 
-```bash
-mysql -u root -p doctor_who_db < database_objects.sql
-```
-
-Or execute the SQL statements from `database_objects.sql` directly in MySQL Workbench.
-
-### 7. Seed the Database
-
-Populate the database with sample data (3+ rows per table):
+### 6. Add Sample Data
 
 ```bash
 npm run db:seed
 ```
 
-### 8. Start the Server
+### 7. Run the Server
 
 ```bash
 npm start
 ```
 
-Or for development with auto-reload:
-
-```bash
-npm run dev
-```
-
-The API will be available at `http://localhost:3000`
+Server runs at `http://localhost:3000`
 
 ## API Endpoints
 

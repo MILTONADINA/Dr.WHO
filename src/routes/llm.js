@@ -4,7 +4,7 @@ const { OpenAI } = require('openai');
 const sequelize = require('../db/sequelize');
 const models = require('../models');
 
-// Initialize OpenAI client (if API key is provided)
+// Setup OpenAI if we have an API key
 let openai = null;
 if (process.env.OPENAI_API_KEY) {
   openai = new OpenAI({
@@ -12,7 +12,6 @@ if (process.env.OPENAI_API_KEY) {
   });
 }
 
-// Helper function to get database schema information
 async function getDatabaseSchema() {
   const schema = {
     tables: [
@@ -32,7 +31,6 @@ async function getDatabaseSchema() {
   return schema;
 }
 
-// Helper function to execute SQL query safely
 async function executeSafeQuery(query) {
   // Only allow SELECT queries for safety
   if (!query.trim().toUpperCase().startsWith('SELECT')) {
@@ -46,7 +44,7 @@ async function executeSafeQuery(query) {
   }
 }
 
-// POST /api/llm/query - Natural language query
+// Natural language query endpoint
 router.post('/query', async (req, res) => {
   try {
     if (!openai) {
@@ -68,30 +66,16 @@ router.post('/query', async (req, res) => {
     const sampleEpisodes = await models.Episode.findAll({ limit: 3, include: [{ model: models.Season, as: 'season' }] });
     const sampleEnemies = await models.Enemy.findAll({ limit: 3 });
 
-    const systemPrompt = `You are an AI assistant helping users query a Doctor Who database.
-The database has the following tables: ${schema.tables.join(', ')}.
+    const systemPrompt = `Help users query our Doctor Who database. Tables: ${schema.tables.join(', ')}.
 
-Key relationships:
-${schema.relationships.join('\n')}
+Relationships: ${schema.relationships.join(', ')}
 
 Sample data:
-- Doctors: ${JSON.stringify(sampleDoctors.map(d => ({ id: d.doctor_id, incarnation: d.incarnation_number, actor: d.actor?.name })))}
-- Episodes: ${JSON.stringify(sampleEpisodes.map(e => ({ id: e.episode_id, title: e.title, season: e.season?.series_number })))}
-- Enemies: ${JSON.stringify(sampleEnemies.map(e => ({ id: e.enemy_id, name: e.name, threat: e.threat_level })))}
+Doctors: ${JSON.stringify(sampleDoctors.map(d => ({ id: d.doctor_id, incarnation: d.incarnation_number, actor: d.actor?.name })))}
+Episodes: ${JSON.stringify(sampleEpisodes.map(e => ({ id: e.episode_id, title: e.title, season: e.season?.series_number })))}
+Enemies: ${JSON.stringify(sampleEnemies.map(e => ({ id: e.enemy_id, name: e.name, threat: e.threat_level })))}
 
-When users ask questions, you should:
-1. Understand their intent
-2. Suggest appropriate API endpoints or SQL queries
-3. Provide helpful explanations
-
-Available API endpoints:
-- GET /api/doctors - Get all doctors
-- GET /api/episodes - Get all episodes
-- GET /api/queries/join/doctor/:id - Get doctor with full details
-- GET /api/queries/view/doctor-summary - Get doctor summary view
-- GET /api/queries/procedure/enemies/:threatLevel - Get enemies by threat level
-
-If the user asks a question that can be answered with data, provide a helpful response based on the database structure and suggest how they could query it.`;
+Answer questions about the database and suggest relevant API endpoints when helpful.`;
 
     const completion = await openai.chat.completions.create({
       model: 'gpt-3.5-turbo',

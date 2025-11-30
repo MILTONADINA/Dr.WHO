@@ -54,11 +54,11 @@ async function startServer() {
   try {
     // Test database connection
     await sequelize.authenticate();
-    console.log('✓ Database connection established.');
+    console.log('[OK] Database connection established.');
 
     app.listen(PORT, () => {
-      console.log(`✓ Server running on http://localhost:${PORT}`);
-      console.log(`✓ API available at http://localhost:${PORT}/api`);
+      console.log(`[OK] Server running on http://localhost:${PORT}`);
+      console.log(`[OK] API available at http://localhost:${PORT}/api`);
     });
   } catch (error) {
     console.error('Unable to start server:', error);

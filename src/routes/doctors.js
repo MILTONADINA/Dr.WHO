@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const doctorService = require('../services/doctorService');
 
-// GET /api/doctors - Get all doctors
+// Get all doctors
 router.get('/', async (req, res) => {
   try {
     const doctors = await doctorService.getAllDoctors();
@@ -12,7 +12,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-// GET /api/doctors/:id - Get doctor by ID
+// Get single doctor
 router.get('/:id', async (req, res) => {
   try {
     const doctor = await doctorService.getDoctorById(req.params.id);
@@ -25,7 +25,7 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// POST /api/doctors - Create new doctor
+// Create doctor
 router.post('/', async (req, res) => {
   try {
     const doctor = await doctorService.createDoctor(req.body);
@@ -35,7 +35,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-// PUT /api/doctors/:id - Update doctor
+// Update doctor
 router.put('/:id', async (req, res) => {
   try {
     const doctor = await doctorService.updateDoctor(req.params.id, req.body);
@@ -45,7 +45,7 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-// DELETE /api/doctors/:id - Delete doctor
+// Delete doctor
 router.delete('/:id', async (req, res) => {
   try {
     await doctorService.deleteDoctor(req.params.id);

@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const episodeService = require('../services/episodeService');
 
-// GET /api/episodes - Get all episodes
+// Get all episodes
 router.get('/', async (req, res) => {
   try {
     const episodes = await episodeService.getAllEpisodes();
@@ -12,7 +12,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-// GET /api/episodes/:id - Get episode by ID
+// Get single episode
 router.get('/:id', async (req, res) => {
   try {
     const episode = await episodeService.getEpisodeById(req.params.id);
@@ -25,7 +25,7 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// POST /api/episodes - Create new episode
+// Create episode
 router.post('/', async (req, res) => {
   try {
     const episode = await episodeService.createEpisode(req.body);
@@ -35,7 +35,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-// PUT /api/episodes/:id - Update episode
+// Update episode
 router.put('/:id', async (req, res) => {
   try {
     const episode = await episodeService.updateEpisode(req.params.id, req.body);
@@ -45,7 +45,7 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-// DELETE /api/episodes/:id - Delete episode
+// Delete episode
 router.delete('/:id', async (req, res) => {
   try {
     await episodeService.deleteEpisode(req.params.id);

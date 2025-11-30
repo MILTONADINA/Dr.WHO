@@ -1,6 +1,3 @@
--- ============================================
--- Doctor Who Database - Views and Stored Procedures
--- ============================================
 
 -- VIEW: Doctor Episode Summary
 -- Provides a summary of each Doctor with their episodes, companions, and enemies
@@ -47,7 +44,7 @@ GROUP BY en.enemy_id, en.name, en.threat_level, s.name, p.name;
 
 -- STORED PROCEDURE: Get Enemies by Threat Level
 -- Returns all enemies with a threat level greater than or equal to the specified level
-DELIMITER //
+DELIMITER $$
 CREATE PROCEDURE GetEnemiesByThreatLevel(IN min_threat_level INT)
 BEGIN
     SELECT
@@ -64,12 +61,12 @@ BEGIN
     WHERE e.threat_level >= min_threat_level
     GROUP BY e.enemy_id, e.name, e.threat_level, s.name, p.name
     ORDER BY e.threat_level DESC;
-END //
+END $$
 DELIMITER ;
 
 -- STORED PROCEDURE: Get Episodes for Doctor
 -- Returns all episodes associated with a specific Doctor incarnation
-DELIMITER //
+DELIMITER $$
 CREATE PROCEDURE GetEpisodesForDoctor(IN doctor_incarnation INT)
 BEGIN
     SELECT
@@ -97,12 +94,12 @@ BEGIN
     WHERE doc.incarnation_number = doctor_incarnation
     GROUP BY e.episode_id, e.title, e.air_date, e.runtime_minutes, s.series_number, s.year, w.name, d.name
     ORDER BY e.air_date;
-END //
+END $$
 DELIMITER ;
 
 -- STORED PROCEDURE: Update Enemy Threat Level
 -- Updates the threat level of an enemy and returns the updated record
-DELIMITER //
+DELIMITER $$
 CREATE PROCEDURE UpdateEnemyThreatLevel(
     IN enemy_id_param INT,
     IN new_threat_level INT
@@ -129,6 +126,6 @@ BEGIN
     LEFT JOIN SPECIES s ON e.species_id = s.species_id
     LEFT JOIN PLANETS p ON e.home_planet_id = p.planet_id
     WHERE e.enemy_id = enemy_id_param;
-END //
+END $$
 DELIMITER ;
 

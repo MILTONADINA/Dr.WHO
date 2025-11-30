@@ -1,12 +1,7 @@
 const models = require('../models');
 const sequelize = require('../db/sequelize');
 
-/**
- * Script to import a large dataset (2000+ rows) for extra credit 7d
- * This script generates realistic Doctor Who data programmatically
- */
-
-// Sample data arrays for generation
+// Sample data for generating large dataset
 const firstNames = ['John', 'Sarah', 'Rose', 'Amy', 'Clara', 'Donna', 'Martha', 'Bill', 'Yasmin', 'Graham', 'Ryan', 'Dan'];
 const lastNames = ['Smith', 'Jones', 'Tyler', 'Pond', 'Oswald', 'Noble', 'Williams', 'Potts', 'Khan', 'O\'Brien', 'Sinclair', 'Lewis'];
 const planetNames = ['Gallifrey', 'Earth', 'Skaro', 'Mondas', 'New Earth', 'Trenzalore', 'Karn', 'Messaline', 'Sanctuary Base', 'The Library'];
@@ -17,7 +12,7 @@ async function generateLargeDataset() {
   try {
     console.log('Starting large dataset import (2000+ rows)...');
 
-    // Get existing data for foreign keys
+    // Get existing data
     const existingActors = await models.Actor.findAll();
     const existingWriters = await models.Writer.findAll();
     const existingDirectors = await models.Director.findAll();
@@ -32,7 +27,7 @@ async function generateLargeDataset() {
 
     let totalRows = 0;
 
-    // Generate 500+ Actors
+    // Generate actors
     console.log('Generating actors...');
     const newActors = [];
     for (let i = 0; i < 500; i++) {
@@ -44,9 +39,9 @@ async function generateLargeDataset() {
     }
     const createdActors = await models.Actor.bulkCreate(newActors, { ignoreDuplicates: true });
     totalRows += createdActors.length;
-    console.log(`✓ Created ${createdActors.length} actors`);
+    console.log(`[OK] Created ${createdActors.length} actors`);
 
-    // Generate 200+ Episodes
+    // Generate episodes
     console.log('Generating episodes...');
     const newEpisodes = [];
     for (let i = 0; i < 200; i++) {
@@ -62,9 +57,9 @@ async function generateLargeDataset() {
     }
     const createdEpisodes = await models.Episode.bulkCreate(newEpisodes, { ignoreDuplicates: true });
     totalRows += createdEpisodes.length;
-    console.log(`✓ Created ${createdEpisodes.length} episodes`);
+    console.log(`[OK] Created ${createdEpisodes.length} episodes`);
 
-    // Generate 100+ Companions
+    // Generate companions
     console.log('Generating companions...');
     const newCompanions = [];
     const allActors = await models.Actor.findAll();
@@ -82,9 +77,9 @@ async function generateLargeDataset() {
     }
     const createdCompanions = await models.Companion.bulkCreate(newCompanions, { ignoreDuplicates: true });
     totalRows += createdCompanions.length;
-    console.log(`✓ Created ${createdCompanions.length} companions`);
+    console.log(`[OK] Created ${createdCompanions.length} companions`);
 
-    // Generate 300+ Characters
+    // Generate characters
     console.log('Generating characters...');
     const newCharacters = [];
     for (let i = 0; i < 300; i++) {
@@ -100,9 +95,9 @@ async function generateLargeDataset() {
     }
     const createdCharacters = await models.Character.bulkCreate(newCharacters, { ignoreDuplicates: true });
     totalRows += createdCharacters.length;
-    console.log(`✓ Created ${createdCharacters.length} characters`);
+    console.log(`[OK] Created ${createdCharacters.length} characters`);
 
-    // Generate 200+ Enemies
+    // Generate enemies
     console.log('Generating enemies...');
     const newEnemies = [];
     for (let i = 0; i < 200; i++) {
@@ -115,9 +110,9 @@ async function generateLargeDataset() {
     }
     const createdEnemies = await models.Enemy.bulkCreate(newEnemies, { ignoreDuplicates: true });
     totalRows += createdEnemies.length;
-    console.log(`✓ Created ${createdEnemies.length} enemies`);
+    console.log(`[OK] Created ${createdEnemies.length} enemies`);
 
-    // Generate 500+ Episode Appearances
+    // Generate episode appearances
     console.log('Generating episode appearances...');
     const newAppearances = [];
     for (let i = 0; i < 500; i++) {
@@ -132,9 +127,9 @@ async function generateLargeDataset() {
     }
     const createdAppearances = await models.EpisodeAppearance.bulkCreate(newAppearances, { ignoreDuplicates: true });
     totalRows += createdAppearances.length;
-    console.log(`✓ Created ${createdAppearances.length} episode appearances`);
+    console.log(`[OK] Created ${createdAppearances.length} episode appearances`);
 
-    // Generate 300+ Episode Locations
+    // Generate episode locations
     console.log('Generating episode locations...');
     const newLocations = [];
     for (let i = 0; i < 300; i++) {
@@ -148,9 +143,9 @@ async function generateLargeDataset() {
     }
     const createdLocations = await models.EpisodeLocation.bulkCreate(newLocations, { ignoreDuplicates: true });
     totalRows += createdLocations.length;
-    console.log(`✓ Created ${createdLocations.length} episode locations`);
+    console.log(`[OK] Created ${createdLocations.length} episode locations`);
 
-    // Generate 400+ Enemy Episodes
+    // Generate enemy episodes
     console.log('Generating enemy episodes...');
     const newEnemyEpisodes = [];
     for (let i = 0; i < 400; i++) {
@@ -164,11 +159,11 @@ async function generateLargeDataset() {
     }
     const createdEnemyEpisodes = await models.EnemyEpisode.bulkCreate(newEnemyEpisodes, { ignoreDuplicates: true });
     totalRows += createdEnemyEpisodes.length;
-    console.log(`✓ Created ${createdEnemyEpisodes.length} enemy episodes`);
+    console.log(`[OK] Created ${createdEnemyEpisodes.length} enemy episodes`);
 
-    console.log(`\n✓ Large dataset import completed!`);
-    console.log(`✓ Total rows created: ${totalRows}`);
-    console.log(`✓ This exceeds the 2000+ row requirement for extra credit 7d`);
+    console.log(`\n[SUCCESS] Large dataset import completed!`);
+    console.log(`[INFO] Total rows created: ${totalRows}`);
+    console.log(`[INFO] This exceeds the 2000+ row requirement for extra credit 7d`);
 
     process.exit(0);
   } catch (error) {

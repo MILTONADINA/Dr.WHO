@@ -368,7 +368,7 @@ async function updateEnemyThreat() {
         }
         const data = await response.json();
         if (data && data.enemy_id) {
-            results.innerHTML = `<div class="success">✅ Updated successfully! Enemy "${data.name}" threat level is now ${data.threat_level}</div><pre>${JSON.stringify(data, null, 2)}</pre>`;
+            results.innerHTML = `<div class="success">[SUCCESS] Updated successfully! Enemy "${data.name}" threat level is now ${data.threat_level}</div><pre>${JSON.stringify(data, null, 2)}</pre>`;
             // Clear input fields
             document.getElementById('enemy-id').value = '';
             document.getElementById('new-threat').value = '';
@@ -399,7 +399,7 @@ async function askLLM() {
             const errorData = await response.json();
             if (errorData.error && (errorData.error.includes('quota') || errorData.error.includes('429'))) {
                 results.innerHTML = `<div class="error">
-                    <strong>⚠️ API Quota Exceeded:</strong><br>
+                    <strong>[WARNING] API Quota Exceeded:</strong><br>
                     ${errorData.error}<br><br>
                     <strong>Important Note:</strong><br>
                     <ul style="text-align: left; margin: 10px 0;">
@@ -408,7 +408,7 @@ async function askLLM() {
                         <li>Visit: <a href="https://platform.openai.com/account/billing" target="_blank">platform.openai.com/account/billing</a></li>
                         <li>Add payment method and purchase API credits</li>
                     </ul>
-                    <em style="color: #4caf50;"><strong>✅ Code Status:</strong> The LLM integration is fully implemented and working correctly. This is purely a billing/quota issue, not a code problem. For your presentation, you can demonstrate the feature works by showing the error handling and explaining the API setup process.</em>
+                    <em style="color: #4caf50;"><strong>[NOTE] Code Status:</strong> The LLM integration is fully implemented and working correctly. This is purely a billing/quota issue, not a code problem. For your presentation, you can demonstrate the feature works by showing the error handling and explaining the API setup process.</em>
                 </div>`;
                 return;
             }

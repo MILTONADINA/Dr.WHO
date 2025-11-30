@@ -39,7 +39,7 @@ function makeRequest(method, path, data = null) {
 }
 
 async function runAllTests() {
-  console.log('🧪 Testing All API Endpoints\n');
+  console.log('Testing All API Endpoints\n');
   console.log('='.repeat(60));
 
   // Test 1: GET /api/doctors
@@ -47,9 +47,9 @@ async function runAllTests() {
   try {
     const result = await makeRequest('GET', '/api/doctors');
     console.log(`   Status: ${result.status}`);
-    console.log(`   ✅ Returns ${Array.isArray(result.data) ? result.data.length : 0} doctors`);
+    console.log(`   [PASS] Returns ${Array.isArray(result.data) ? result.data.length : 0} doctors`);
   } catch (error) {
-    console.log(`   ❌ Error: ${error.message}`);
+    console.log(`   [FAIL] Error: ${error.message}`);
   }
 
   // Test 2: GET /api/doctors/1
@@ -57,9 +57,9 @@ async function runAllTests() {
   try {
     const result = await makeRequest('GET', '/api/doctors/1');
     console.log(`   Status: ${result.status}`);
-    console.log(`   ✅ Doctor: ${result.data.incarnation_number || 'N/A'}`);
+    console.log(`   [PASS] Doctor: ${result.data.incarnation_number || 'N/A'}`);
   } catch (error) {
-    console.log(`   ❌ Error: ${error.message}`);
+    console.log(`   [FAIL] Error: ${error.message}`);
   }
 
   // Test 3: POST /api/doctors
@@ -72,12 +72,12 @@ async function runAllTests() {
     });
     console.log(`   Status: ${result.status}`);
     if (result.status === 201) {
-      console.log(`   ✅ Doctor created successfully`);
+      console.log(`   [PASS] Doctor created successfully`);
     } else {
-      console.log(`   ⚠️  ${result.data.error || 'Unexpected response'}`);
+      console.log(`   [WARN] ${result.data.error || 'Unexpected response'}`);
     }
   } catch (error) {
-    console.log(`   ❌ Error: ${error.message}`);
+    console.log(`   [FAIL] Error: ${error.message}`);
   }
 
   // Test 4: PUT /api/doctors/1
@@ -88,12 +88,12 @@ async function runAllTests() {
     });
     console.log(`   Status: ${result.status}`);
     if (result.status === 200) {
-      console.log(`   ✅ Doctor updated: ${result.data.catchphrase}`);
+      console.log(`   [PASS] Doctor updated: ${result.data.catchphrase}`);
     } else {
-      console.log(`   ⚠️  ${result.data.error || 'Unexpected response'}`);
+      console.log(`   [WARN] ${result.data.error || 'Unexpected response'}`);
     }
   } catch (error) {
-    console.log(`   ❌ Error: ${error.message}`);
+    console.log(`   [FAIL] Error: ${error.message}`);
   }
 
   // Test 5: GET /api/episodes
@@ -101,9 +101,9 @@ async function runAllTests() {
   try {
     const result = await makeRequest('GET', '/api/episodes');
     console.log(`   Status: ${result.status}`);
-    console.log(`   ✅ Returns ${Array.isArray(result.data) ? result.data.length : 0} episodes`);
+    console.log(`   [PASS] Returns ${Array.isArray(result.data) ? result.data.length : 0} episodes`);
   } catch (error) {
-    console.log(`   ❌ Error: ${error.message}`);
+    console.log(`   [FAIL] Error: ${error.message}`);
   }
 
   // Test 6: GET /api/queries/procedure/enemies/8
@@ -112,12 +112,12 @@ async function runAllTests() {
     const result = await makeRequest('GET', '/api/queries/procedure/enemies/8');
     console.log(`   Status: ${result.status}`);
     if (Array.isArray(result.data)) {
-      console.log(`   ✅ Returns ${result.data.length} enemies with threat >= 8`);
+      console.log(`   [PASS] Returns ${result.data.length} enemies with threat >= 8`);
     } else {
-      console.log(`   ✅ Stored procedure executed`);
+      console.log(`   [PASS] Stored procedure executed`);
     }
   } catch (error) {
-    console.log(`   ❌ Error: ${error.message}`);
+    console.log(`   [FAIL] Error: ${error.message}`);
   }
 
   // Test 7: GET /api/queries/procedure/doctor/10
@@ -126,12 +126,12 @@ async function runAllTests() {
     const result = await makeRequest('GET', '/api/queries/procedure/doctor/10');
     console.log(`   Status: ${result.status}`);
     if (Array.isArray(result.data)) {
-      console.log(`   ✅ Returns ${result.data.length} episodes for Doctor 10`);
+      console.log(`   [PASS] Returns ${result.data.length} episodes for Doctor 10`);
     } else {
-      console.log(`   ✅ Stored procedure executed`);
+      console.log(`   [PASS] Stored procedure executed`);
     }
   } catch (error) {
-    console.log(`   ❌ Error: ${error.message}`);
+    console.log(`   [FAIL] Error: ${error.message}`);
   }
 
   // Test 8: PUT /api/queries/update/enemy/1/threat-level
@@ -142,12 +142,12 @@ async function runAllTests() {
     });
     console.log(`   Status: ${result.status}`);
     if (result.status === 200) {
-      console.log(`   ✅ Enemy threat level updated to ${result.data.threat_level}`);
+      console.log(`   [PASS] Enemy threat level updated to ${result.data.threat_level}`);
     } else {
-      console.log(`   ⚠️  ${result.data.error || 'Unexpected response'}`);
+      console.log(`   [WARN] ${result.data.error || 'Unexpected response'}`);
     }
   } catch (error) {
-    console.log(`   ❌ Error: ${error.message}`);
+    console.log(`   [FAIL] Error: ${error.message}`);
   }
 
   // Test 9: POST /api/llm/query
@@ -160,17 +160,17 @@ async function runAllTests() {
     if (result.data.error) {
       console.log(`   ⚠️  ${result.data.error}`);
     } else if (result.data.answer) {
-      console.log(`   ✅ LLM Response received`);
+      console.log(`   [PASS] LLM Response received`);
       console.log(`   Answer: ${result.data.answer.substring(0, 100)}...`);
     } else {
-      console.log(`   ✅ LLM endpoint working`);
+      console.log(`   [PASS] LLM endpoint working`);
     }
   } catch (error) {
-    console.log(`   ❌ Error: ${error.message}`);
+    console.log(`   [FAIL] Error: ${error.message}`);
   }
 
   console.log('\n' + '='.repeat(60));
-  console.log('✅ All tests completed!');
+  console.log('[DONE] All tests completed!');
 }
 
 runAllTests();

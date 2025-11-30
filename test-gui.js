@@ -1,8 +1,3 @@
-/**
- * Comprehensive GUI Testing Script
- * Tests all GUI functionality through API endpoints
- */
-
 const http = require('http');
 
 const API_BASE = 'http://localhost:3000/api';
@@ -30,13 +25,12 @@ function makeRequest(options, data = null) {
 }
 
 async function testGUI() {
-  console.log('🧪 COMPREHENSIVE GUI TESTING\n');
+  console.log('COMPREHENSIVE GUI TESTING\n');
   console.log('='.repeat(60));
 
   let passed = 0;
   let failed = 0;
 
-  // Test 1: Load Doctors
   console.log('\n1. Testing Doctors CRUD...');
   try {
     const { status, data } = await makeRequest({
@@ -46,18 +40,17 @@ async function testGUI() {
       method: 'GET'
     });
     if (status === 200 && Array.isArray(data)) {
-      console.log(`   ✅ Load Doctors: ${data.length} doctors loaded`);
+      console.log(`   [PASS] Load Doctors: ${data.length} doctors loaded`);
       passed++;
     } else {
-      console.log(`   ❌ Load Doctors: Status ${status}`);
+      console.log(`   [FAIL] Load Doctors: Status ${status}`);
       failed++;
     }
   } catch (error) {
-    console.log(`   ❌ Load Doctors: ${error.message}`);
+    console.log(`   [FAIL] Load Doctors: ${error.message}`);
     failed++;
   }
 
-  // Test 2: Get Single Doctor
   try {
     const { status, data } = await makeRequest({
       hostname: 'localhost',
@@ -66,18 +59,17 @@ async function testGUI() {
       method: 'GET'
     });
     if (status === 200 && data.doctor_id) {
-      console.log(`   ✅ Get Doctor: Doctor #${data.incarnation_number} found`);
+      console.log(`   [PASS] Get Doctor: Doctor #${data.incarnation_number} found`);
       passed++;
     } else {
-      console.log(`   ❌ Get Doctor: Status ${status}`);
+      console.log(`   [FAIL] Get Doctor: Status ${status}`);
       failed++;
     }
   } catch (error) {
-    console.log(`   ❌ Get Doctor: ${error.message}`);
+    console.log(`   [FAIL] Get Doctor: ${error.message}`);
     failed++;
   }
 
-  // Test 3: Create Doctor
   try {
     const { status, data } = await makeRequest({
       hostname: 'localhost',
@@ -91,9 +83,9 @@ async function testGUI() {
       catchphrase: 'Test Doctor'
     });
     if (status === 201 || status === 200) {
-      console.log(`   ✅ Create Doctor: Doctor created`);
+      console.log(`   [PASS] Create Doctor: Doctor created`);
       passed++;
-      // Clean up - delete test doctor
+      // cleanup
       await makeRequest({
         hostname: 'localhost',
         port: 3000,
@@ -101,15 +93,14 @@ async function testGUI() {
         method: 'DELETE'
       });
     } else {
-      console.log(`   ⚠️  Create Doctor: Status ${status} (may be validation error)`);
-      if (status === 400) passed++; // Validation is working
+      console.log(`   [WARN] Create Doctor: Status ${status} (may be validation error)`);
+      if (status === 400) passed++;
     }
   } catch (error) {
-    console.log(`   ❌ Create Doctor: ${error.message}`);
+    console.log(`   [FAIL] Create Doctor: ${error.message}`);
     failed++;
   }
 
-  // Test 4: Update Doctor
   try {
     const { status, data } = await makeRequest({
       hostname: 'localhost',
@@ -121,18 +112,17 @@ async function testGUI() {
       catchphrase: 'Updated Catchphrase'
     });
     if (status === 200) {
-      console.log(`   ✅ Update Doctor: Doctor updated`);
+      console.log(`   [PASS] Update Doctor: Doctor updated`);
       passed++;
     } else {
-      console.log(`   ❌ Update Doctor: Status ${status}`);
+      console.log(`   [FAIL] Update Doctor: Status ${status}`);
       failed++;
     }
   } catch (error) {
-    console.log(`   ❌ Update Doctor: ${error.message}`);
+    console.log(`   [FAIL] Update Doctor: ${error.message}`);
     failed++;
   }
 
-  // Test 5: Load Episodes
   console.log('\n2. Testing Episodes CRUD...');
   try {
     const { status, data } = await makeRequest({
@@ -142,18 +132,17 @@ async function testGUI() {
       method: 'GET'
     });
     if (status === 200 && Array.isArray(data)) {
-      console.log(`   ✅ Load Episodes: ${data.length} episodes loaded`);
+      console.log(`   [PASS] Load Episodes: ${data.length} episodes loaded`);
       passed++;
     } else {
-      console.log(`   ❌ Load Episodes: Status ${status}`);
+      console.log(`   [FAIL] Load Episodes: Status ${status}`);
       failed++;
     }
   } catch (error) {
-    console.log(`   ❌ Load Episodes: ${error.message}`);
+    console.log(`   [FAIL] Load Episodes: ${error.message}`);
     failed++;
   }
 
-  // Test 6: Multi-Join Query
   console.log('\n3. Testing Queries...');
   try {
     const { status, data } = await makeRequest({
@@ -163,18 +152,17 @@ async function testGUI() {
       method: 'GET'
     });
     if (status === 200 && data) {
-      console.log(`   ✅ Multi-Join Query: Doctor details retrieved`);
+      console.log(`   [PASS] Multi-Join Query: Doctor details retrieved`);
       passed++;
     } else {
-      console.log(`   ❌ Multi-Join Query: Status ${status}`);
+      console.log(`   [FAIL] Multi-Join Query: Status ${status}`);
       failed++;
     }
   } catch (error) {
-    console.log(`   ❌ Multi-Join Query: ${error.message}`);
+    console.log(`   [FAIL] Multi-Join Query: ${error.message}`);
     failed++;
   }
 
-  // Test 7: VIEW Query
   try {
     const { status, data } = await makeRequest({
       hostname: 'localhost',
@@ -183,21 +171,20 @@ async function testGUI() {
       method: 'GET'
     });
     if (status === 200) {
-      console.log(`   ✅ VIEW Query: ${Array.isArray(data) ? data.length + ' rows' : 'Data retrieved'}`);
+      console.log(`   [PASS] VIEW Query: ${Array.isArray(data) ? data.length + ' rows' : 'Data retrieved'}`);
       passed++;
     } else if (status === 500 && data.error && data.error.includes("doesn't exist")) {
-      console.log(`   ⚠️  VIEW Query: VIEW not created (expected if SQL not run)`);
-      passed++; // Not a code error
+      console.log(`   [WARN] VIEW Query: VIEW not created (expected if SQL not run)`);
+      passed++;
     } else {
-      console.log(`   ❌ VIEW Query: Status ${status}`);
+      console.log(`   [FAIL] VIEW Query: Status ${status}`);
       failed++;
     }
   } catch (error) {
-    console.log(`   ❌ VIEW Query: ${error.message}`);
+    console.log(`   [FAIL] VIEW Query: ${error.message}`);
     failed++;
   }
 
-  // Test 8: Stored Procedure
   try {
     const { status, data } = await makeRequest({
       hostname: 'localhost',
@@ -206,18 +193,17 @@ async function testGUI() {
       method: 'GET'
     });
     if (status === 200) {
-      console.log(`   ✅ Stored Procedure: ${Array.isArray(data) ? data.length + ' enemies' : 'Data retrieved'}`);
+      console.log(`   [PASS] Stored Procedure: ${Array.isArray(data) ? data.length + ' enemies' : 'Data retrieved'}`);
       passed++;
     } else {
-      console.log(`   ❌ Stored Procedure: Status ${status}`);
+      console.log(`   [FAIL] Stored Procedure: Status ${status}`);
       failed++;
     }
   } catch (error) {
-    console.log(`   ❌ Stored Procedure: ${error.message}`);
+    console.log(`   [FAIL] Stored Procedure: ${error.message}`);
     failed++;
   }
 
-  // Test 9: UPDATE Query
   try {
     const { status, data } = await makeRequest({
       hostname: 'localhost',
@@ -229,18 +215,17 @@ async function testGUI() {
       threat_level: 8
     });
     if (status === 200 && data && data.enemy_id) {
-      console.log(`   ✅ UPDATE Query: Enemy threat level updated to ${data.threat_level}`);
+      console.log(`   [PASS] UPDATE Query: Enemy threat level updated to ${data.threat_level}`);
       passed++;
     } else {
-      console.log(`   ❌ UPDATE Query: Status ${status}`);
+      console.log(`   [FAIL] UPDATE Query: Status ${status}`);
       failed++;
     }
   } catch (error) {
-    console.log(`   ❌ UPDATE Query: ${error.message}`);
+    console.log(`   [FAIL] UPDATE Query: ${error.message}`);
     failed++;
   }
 
-  // Test 10: LLM Query
   console.log('\n4. Testing LLM Integration...');
   try {
     const { status, data } = await makeRequest({
@@ -253,31 +238,30 @@ async function testGUI() {
       query: 'How many doctors are in the database?'
     });
     if (status === 200) {
-      console.log(`   ✅ LLM Query: Response received`);
+      console.log(`   [PASS] LLM Query: Response received`);
       passed++;
     } else if (status === 500 && data.error && (data.error.includes('quota') || data.error.includes('API key'))) {
-      console.log(`   ⚠️  LLM Query: API key/quota issue (expected if not configured)`);
-      passed++; // Not a code error
+      console.log(`   [WARN] LLM Query: API key/quota issue (expected if not configured)`);
+      passed++;
     } else {
-      console.log(`   ❌ LLM Query: Status ${status}`);
+      console.log(`   [FAIL] LLM Query: Status ${status}`);
       failed++;
     }
   } catch (error) {
-    console.log(`   ❌ LLM Query: ${error.message}`);
+    console.log(`   [FAIL] LLM Query: ${error.message}`);
     failed++;
   }
 
-  // Summary
   console.log('\n' + '='.repeat(60));
-  console.log(`\n📊 TEST SUMMARY:`);
-  console.log(`   ✅ Passed: ${passed}`);
-  console.log(`   ❌ Failed: ${failed}`);
-  console.log(`   📈 Success Rate: ${((passed / (passed + failed)) * 100).toFixed(1)}%`);
+  console.log(`\nTEST SUMMARY:`);
+  console.log(`   Passed: ${passed}`);
+  console.log(`   Failed: ${failed}`);
+  console.log(`   Success Rate: ${((passed / (passed + failed)) * 100).toFixed(1)}%`);
 
   if (failed === 0) {
-    console.log('\n🎉 ALL TESTS PASSED! GUI is fully functional!');
+    console.log('\nALL TESTS PASSED! GUI is fully functional!');
   } else {
-    console.log('\n⚠️  Some tests failed. Please review the errors above.');
+    console.log('\nSome tests failed. Please review the errors above.');
   }
 }
 

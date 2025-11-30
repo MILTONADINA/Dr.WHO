@@ -1,12 +1,10 @@
 const { Episode, Season, Writer, Director } = require('../models');
 
 class EpisodeService {
-  // Create
   async createEpisode(data) {
     return await Episode.create(data);
   }
 
-  // Read - Get all
   async getAllEpisodes() {
     return await Episode.findAll({
       include: [
@@ -18,7 +16,6 @@ class EpisodeService {
     });
   }
 
-  // Read - Get by ID
   async getEpisodeById(id) {
     return await Episode.findByPk(id, {
       include: [
@@ -29,7 +26,6 @@ class EpisodeService {
     });
   }
 
-  // Update
   async updateEpisode(id, data) {
     const episode = await Episode.findByPk(id);
     if (!episode) {
@@ -38,7 +34,6 @@ class EpisodeService {
     return await episode.update(data);
   }
 
-  // Delete
   async deleteEpisode(id) {
     const episode = await Episode.findByPk(id);
     if (!episode) {

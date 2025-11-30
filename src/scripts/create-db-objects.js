@@ -23,17 +23,17 @@ async function createDatabaseObjects() {
       if (statement.includes('CREATE') || statement.includes('ALTER')) {
         try {
           await sequelize.query(statement);
-          console.log(`✓ Executed: ${statement.substring(0, 50)}...`);
+          console.log(`[OK] Executed: ${statement.substring(0, 50)}...`);
         } catch (error) {
           // Ignore "already exists" errors
           if (!error.message.includes('already exists') && !error.message.includes('Duplicate')) {
-            console.log(`⚠ Warning: ${error.message}`);
+            console.log(`[WARN] Warning: ${error.message}`);
           }
         }
       }
     }
 
-    console.log('\n✓ Database objects created successfully!');
+    console.log('\n[SUCCESS] Database objects created successfully!');
     process.exit(0);
   } catch (error) {
     console.error('Error creating database objects:', error);

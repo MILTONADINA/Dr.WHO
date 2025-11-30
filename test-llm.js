@@ -35,7 +35,7 @@ function testLLM(query) {
 }
 
 async function runTests() {
-  console.log('🧪 Testing LLM Endpoint with OpenAI API Key...\n');
+  console.log(' Testing LLM Endpoint with OpenAI API Key...\n');
 
   const queries = [
     'Which Doctor had the most companions?',
@@ -49,12 +49,12 @@ async function runTests() {
     try {
       const result = await testLLM(query);
       if (result.error) {
-        console.log(`❌ Error: ${result.error}`);
+        console.log(` Error: ${result.error}`);
       } else {
-        console.log(`✅ Response: ${result.answer || result.message || JSON.stringify(result)}`);
+        console.log(` Response: ${result.answer || result.message || JSON.stringify(result)}`);
       }
     } catch (error) {
-      console.log(`❌ Request failed: ${error.message}`);
+      console.log(` Request failed: ${error.message}`);
     }
   }
 }

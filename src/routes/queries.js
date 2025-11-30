@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const queryService = require('../services/queryService');
 
-// GET /api/queries/join/doctor/:id - Multi-join query for doctor details
+// Get doctor with all related data
 router.get('/join/doctor/:id', async (req, res) => {
   try {
     const doctor = await queryService.getDoctorFullDetails(req.params.id);
@@ -16,7 +16,7 @@ router.get('/join/doctor/:id', async (req, res) => {
   }
 });
 
-// GET /api/queries/join/episode/:id - Multi-join query for episode details
+// Get episode with all related data
 router.get('/join/episode/:id', async (req, res) => {
   try {
     const episode = await queryService.getEpisodeWithAllDetails(req.params.id);
@@ -30,7 +30,7 @@ router.get('/join/episode/:id', async (req, res) => {
   }
 });
 
-// GET /api/queries/view/doctor-summary - Query VIEW: doctor_episode_summary
+// Query doctor summary view
 router.get('/view/doctor-summary', async (req, res) => {
   try {
     const results = await queryService.queryDoctorEpisodeSummary();
@@ -40,7 +40,7 @@ router.get('/view/doctor-summary', async (req, res) => {
   }
 });
 
-// GET /api/queries/view/enemy-summary - Query VIEW: enemy_appearance_summary
+// Query enemy summary view
 router.get('/view/enemy-summary', async (req, res) => {
   try {
     const results = await queryService.queryEnemyAppearanceSummary();
@@ -50,7 +50,7 @@ router.get('/view/enemy-summary', async (req, res) => {
   }
 });
 
-// GET /api/queries/procedure/enemies/:threatLevel - Call STORED PROCEDURE: GetEnemiesByThreatLevel
+// Get enemies by threat level (stored procedure)
 router.get('/procedure/enemies/:threatLevel', async (req, res) => {
   try {
     const threatLevel = parseInt(req.params.threatLevel);
@@ -64,7 +64,7 @@ router.get('/procedure/enemies/:threatLevel', async (req, res) => {
   }
 });
 
-// GET /api/queries/procedure/doctor/:incarnation - Call STORED PROCEDURE: GetEpisodesForDoctor
+// Get episodes for doctor (stored procedure)
 router.get('/procedure/doctor/:incarnation', async (req, res) => {
   try {
     const incarnation = parseInt(req.params.incarnation);
@@ -78,7 +78,7 @@ router.get('/procedure/doctor/:incarnation', async (req, res) => {
   }
 });
 
-// PUT /api/queries/update/enemy/:id/threat-level - UPDATE query: Update enemy threat level
+// Update enemy threat level
 router.put('/update/enemy/:id/threat-level', async (req, res) => {
   try {
     const enemyId = parseInt(req.params.id);
