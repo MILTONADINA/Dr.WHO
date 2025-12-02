@@ -48,37 +48,65 @@ function showDoctorForm(doctor = null) {
     const modal = document.getElementById('modal');
     const body = document.getElementById('modal-body');
     body.innerHTML = `
-        <h2>${doctor ? 'Edit' : 'Add'} Doctor</h2>
+        <h2>${doctor ? 'Edit Doctor' : 'Add New Doctor'}</h2>
         <form id="doctor-form">
             <div class="form-group">
-                <label>Actor ID:</label>
-                <input type="number" name="actor_id" value="${doctor?.actor_id || ''}" required>
+                <label>Actor ID <span class="required">*</span></label>
+                <input type="number" name="actor_id" value="${doctor?.actor_id || ''}"
+                       placeholder="e.g., 5 (must exist in database)"
+                       title="Select an existing actor ID from the database"
+                       min="1" required>
+                <small class="help-text">Choose from existing actors in the database</small>
             </div>
             <div class="form-group">
-                <label>Incarnation Number:</label>
-                <input type="number" name="incarnation_number" value="${doctor?.incarnation_number || ''}" required>
+                <label>Incarnation Number <span class="required">*</span></label>
+                <input type="number" name="incarnation_number" value="${doctor?.incarnation_number || ''}"
+                       placeholder="e.g., 10 (unique: 1-15)"
+                       title="Doctor's incarnation number (must be unique)"
+                       min="1" max="15" required>
+                <small class="help-text">Each Doctor has a unique incarnation number (1-15)</small>
             </div>
             <div class="form-group">
-                <label>First Episode ID:</label>
-                <input type="number" name="first_episode_id" value="${doctor?.first_episode_id || ''}">
+                <label>First Episode ID</label>
+                <input type="number" name="first_episode_id" value="${doctor?.first_episode_id || ''}"
+                       placeholder="e.g., 1 (optional)"
+                       title="Episode where this Doctor first appeared"
+                       min="1">
+                <small class="help-text">Optional: First episode this Doctor appeared in</small>
             </div>
             <div class="form-group">
-                <label>Last Episode ID:</label>
-                <input type="number" name="last_episode_id" value="${doctor?.last_episode_id || ''}">
+                <label>Last Episode ID</label>
+                <input type="number" name="last_episode_id" value="${doctor?.last_episode_id || ''}"
+                       placeholder="e.g., 10 (optional)"
+                       title="Episode where this Doctor last appeared"
+                       min="1">
+                <small class="help-text">Optional: Last episode this Doctor appeared in</small>
             </div>
             <div class="form-group">
-                <label>Catchphrase:</label>
-                <input type="text" name="catchphrase" value="${doctor?.catchphrase || ''}">
+                <label>Catchphrase</label>
+                <input type="text" name="catchphrase" value="${doctor?.catchphrase || ''}"
+                       placeholder='e.g., "Allons-y!" or "Geronimo!"'
+                       title="Famous phrase associated with this Doctor"
+                       maxlength="255">
+                <small class="help-text">Optional: Famous phrase this Doctor is known for</small>
             </div>
             <div class="form-actions">
                 <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-                <button type="submit" class="btn btn-primary">${doctor ? 'Update' : 'Create'}</button>
+                <button type="submit" class="btn btn-primary">${doctor ? 'Update Doctor' : 'Create Doctor'}</button>
             </div>
         </form>
     `;
     modal.style.display = 'block';
-    document.getElementById('doctor-form').addEventListener('submit', async (e) => {
+
+    const form = document.getElementById('doctor-form');
+    const submitBtn = form.querySelector('button[type="submit"]');
+
+    form.addEventListener('submit', async (e) => {
         e.preventDefault();
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = doctor ? 'Updating...' : 'Creating...';
+
         const formData = new FormData(e.target);
         const data = Object.fromEntries(formData);
         Object.keys(data).forEach(k => data[k] = data[k] ? (isNaN(data[k]) ? data[k] : parseInt(data[k])) : null);
@@ -91,17 +119,20 @@ function showDoctorForm(doctor = null) {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
             });
+
             if (response.ok) {
                 closeModal();
                 loadDoctors();
-                // Show success message
                 showNotification('Doctor ' + (doctor ? 'updated' : 'created') + ' successfully!', 'success');
             } else {
                 const errorData = await response.json();
-                alert('Error: ' + (errorData.error || 'Unknown error'));
+                showNotification('Error: ' + (errorData.error || errorData.message || 'Unknown error'), 'error');
             }
         } catch (error) {
-            alert('Error: ' + error.message);
+            showNotification('Network error: ' + error.message, 'error');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = doctor ? 'Update Doctor' : 'Create Doctor';
         }
     });
 }
@@ -130,13 +161,58 @@ async function deleteDoctor(id) {
 }
 
 // Episodes CRUD
+let allEpisodes = []; // Store all episodes globally
+
 async function loadEpisodes() {
     try {
         const response = await fetch(`${API_BASE}/episodes`);
         const result = await response.json();
-        const episodes = result.data || result; // Handle both old and new format
-        const list = document.getElementById('episodes-list');
-        list.innerHTML = episodes.map(episode => `
+        allEpisodes = result.data || result;
+
+        // Apply filter based on checkbox state
+        applyEpisodesFilter();
+    } catch (error) {
+        document.getElementById('episodes-list').innerHTML = `<div class="error">Error loading episodes: ${error.message}</div>`;
+    }
+}
+
+function applyEpisodesFilter() {
+    const showVariations = document.getElementById('show-variations')?.checked || false;
+    const list = document.getElementById('episodes-list');
+
+    if (!allEpisodes || allEpisodes.length === 0) {
+        list.innerHTML = '<div class="info">No episodes found. Add your first episode!</div>';
+        return;
+    }
+
+    // Filter episodes based on variation patterns
+    const filteredEpisodes = allEpisodes.filter(episode => {
+        if (!episode.title) return false;
+
+        // Define all variation patterns
+        const variationPatterns = ['(Alt', '(Variation', '(Era', '(Character', '(Version', '(Demo'];
+        const hasVariation = variationPatterns.some(pattern => episode.title.includes(pattern));
+
+        // If showVariations is false, exclude variations; if true, show all
+        return showVariations ? true : !hasVariation;
+    });
+
+    if (filteredEpisodes.length === 0) {
+        list.innerHTML = '<div class="info">No episodes found. ' +
+            (showVariations ? '' : 'Try enabling "Show variations" to see all episodes.') + '</div>';
+        return;
+    }
+
+    // Display count
+    const countText = showVariations
+        ? `Showing all ${filteredEpisodes.length} episodes (including variations)`
+        : `Showing ${filteredEpisodes.length} unique episodes (${allEpisodes.length - filteredEpisodes.length} variations hidden)`;
+
+    list.innerHTML = `
+        <div style="margin-bottom: 15px; padding: 10px; background: #f0f0f0; border-radius: 5px; font-size: 14px; color: #666;">
+            ${countText}
+        </div>
+        ${filteredEpisodes.map(episode => `
             <div class="data-card">
                 <div>
                     <h3>${episode.title}</h3>
@@ -149,55 +225,92 @@ async function loadEpisodes() {
                     <button class="btn btn-danger" onclick="deleteEpisode(${episode.episode_id})">Delete</button>
                 </div>
             </div>
-        `).join('');
-    } catch (error) {
-        document.getElementById('episodes-list').innerHTML = `<div class="error">Error loading episodes: ${error.message}</div>`;
-    }
+        `).join('')}
+    `;
+}
+
+function toggleVariationsFilter() {
+    applyEpisodesFilter();
 }
 
 function showEpisodeForm(episode = null) {
     const modal = document.getElementById('modal');
     const body = document.getElementById('modal-body');
     body.innerHTML = `
-        <h2>${episode ? 'Edit' : 'Add'} Episode</h2>
+        <h2>${episode ? 'Edit Episode' : 'Add New Episode'}</h2>
         <form id="episode-form">
             <div class="form-group">
-                <label>Season ID:</label>
-                <input type="number" name="season_id" value="${episode?.season_id || ''}" required>
+                <label>Season ID <span class="required">*</span></label>
+                <input type="number" name="season_id" value="${episode?.season_id || ''}"
+                       placeholder="e.g., 1 (must exist in database)"
+                       title="Select an existing season ID"
+                       min="1" required>
+                <small class="help-text">Choose from existing seasons in the database</small>
             </div>
             <div class="form-group">
-                <label>Title:</label>
-                <input type="text" name="title" value="${episode?.title || ''}" required>
+                <label>Title <span class="required">*</span></label>
+                <input type="text" name="title" value="${episode?.title || ''}"
+                       placeholder='e.g., "Rose" or "The Empty Child"'
+                       title="Episode title"
+                       maxlength="255" required>
+                <small class="help-text">Full episode title</small>
             </div>
             <div class="form-group">
-                <label>Writer ID:</label>
-                <input type="number" name="writer_id" value="${episode?.writer_id || ''}">
+                <label>Writer ID</label>
+                <input type="number" name="writer_id" value="${episode?.writer_id || ''}"
+                       placeholder="e.g., 1 (optional)"
+                       title="Writer who wrote this episode"
+                       min="1">
+                <small class="help-text">Optional: Writer from the writers table</small>
             </div>
             <div class="form-group">
-                <label>Director ID:</label>
-                <input type="number" name="director_id" value="${episode?.director_id || ''}">
+                <label>Director ID</label>
+                <input type="number" name="director_id" value="${episode?.director_id || ''}"
+                       placeholder="e.g., 1 (optional)"
+                       title="Director who directed this episode"
+                       min="1">
+                <small class="help-text">Optional: Director from the directors table</small>
             </div>
             <div class="form-group">
-                <label>Episode Number:</label>
-                <input type="number" name="episode_number" value="${episode?.episode_number || ''}">
+                <label>Episode Number</label>
+                <input type="number" name="episode_number" value="${episode?.episode_number || ''}"
+                       placeholder="e.g., 1 (within season)"
+                       title="Episode number within the season"
+                       min="1" max="20">
+                <small class="help-text">Optional: Episode number within the season (1-20)</small>
             </div>
             <div class="form-group">
-                <label>Air Date:</label>
-                <input type="date" name="air_date" value="${episode?.air_date || ''}">
+                <label>Air Date</label>
+                <input type="date" name="air_date" value="${episode?.air_date || ''}"
+                       title="Date when the episode first aired"
+                       min="1963-11-23" max="2030-12-31">
+                <small class="help-text">Optional: Original broadcast date</small>
             </div>
             <div class="form-group">
-                <label>Runtime (minutes):</label>
-                <input type="number" name="runtime_minutes" value="${episode?.runtime_minutes || ''}">
+                <label>Runtime (minutes)</label>
+                <input type="number" name="runtime_minutes" value="${episode?.runtime_minutes || ''}"
+                       placeholder="e.g., 45 (typical runtime)"
+                       title="Episode duration in minutes"
+                       min="1" max="180">
+                <small class="help-text">Optional: Episode duration (1-180 minutes)</small>
             </div>
             <div class="form-actions">
                 <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-                <button type="submit" class="btn btn-primary">${episode ? 'Update' : 'Create'}</button>
+                <button type="submit" class="btn btn-primary">${episode ? 'Update Episode' : 'Create Episode'}</button>
             </div>
         </form>
     `;
     modal.style.display = 'block';
-    document.getElementById('episode-form').addEventListener('submit', async (e) => {
+
+    const form = document.getElementById('episode-form');
+    const submitBtn = form.querySelector('button[type="submit"]');
+
+    form.addEventListener('submit', async (e) => {
         e.preventDefault();
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = episode ? 'Updating...' : 'Creating...';
+
         const formData = new FormData(e.target);
         const data = Object.fromEntries(formData);
         Object.keys(data).forEach(k => data[k] = data[k] ? (isNaN(data[k]) ? data[k] : parseInt(data[k])) : null);
@@ -210,17 +323,20 @@ function showEpisodeForm(episode = null) {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
             });
+
             if (response.ok) {
                 closeModal();
                 loadEpisodes();
-                // Show success message
                 showNotification('Episode ' + (episode ? 'updated' : 'created') + ' successfully!', 'success');
             } else {
                 const errorData = await response.json();
-                alert('Error: ' + (errorData.error || 'Unknown error'));
+                showNotification('Error: ' + (errorData.error || errorData.message || 'Unknown error'), 'error');
             }
         } catch (error) {
-            alert('Error: ' + error.message);
+            showNotification('Network error: ' + error.message, 'error');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = episode ? 'Update Episode' : 'Create Episode';
         }
     });
 }
