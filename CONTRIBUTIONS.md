@@ -13,7 +13,7 @@
 
 
 3. **Magnani Fabiola**
-   - Implemented all Sequelize models with associations, and configured database constraints and indexes.She developed  scripts for database synchronization and the 2000+ row import feature Magnani also authored the comprehensive README.md with setup instructions and API documentation.
+   - Implemented all Sequelize models with associations, and configured database constraints and indexes.She developed  scripts for database synchronization and created the powerpoint presentation for the project.Magnani also worked on the comprehensive README.md with setup instructions and API documentation.
 
 ---
 
