@@ -32,7 +32,13 @@
         <div id="episodes-tab" class="tab-content">
             <div class="section-header">
                 <h2>Episodes Management</h2>
-                <button class="btn btn-primary" onclick="showEpisodeForm()">+ Add Episode</button>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 14px;">
+                        <input type="checkbox" id="show-variations" onchange="toggleVariationsFilter()" style="width: 18px; height: 18px; cursor: pointer;">
+                        <span>Show variations</span>
+                    </label>
+                    <button class="btn btn-primary" onclick="showEpisodeForm()">+ Add Episode</button>
+                </div>
             </div>
             <div id="episodes-list" class="data-list"></div>
         </div>
