@@ -9,8 +9,11 @@ const queriesRouter = require('./routes/queries');
 const llmRouter = require('./routes/llm');
 const path = require('path');
 
+const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
+const { DEFAULT_PORT, API_INFO } = require('./config/constants');
+
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || DEFAULT_PORT;
 
 // Middleware
 app.use(cors());
@@ -20,21 +23,13 @@ app.use(express.urlencoded({ extended: true }));
 // Serve static files from public directory
 app.use(express.static(path.join(__dirname, '../public')));
 
-// Routes
+// API Documentation endpoint
 app.get('/', (req, res) => {
   res.json({
-    message: 'Doctor Who Database API',
-    version: '1.0.0',
-    endpoints: {
-      doctors: '/api/doctors',
-      episodes: '/api/episodes',
-      queries: {
-        join: '/api/queries/join/doctor/:id or /api/queries/join/episode/:id',
-        view: '/api/queries/view/doctor-summary or /api/queries/view/enemy-summary',
-        procedure: '/api/queries/procedure/enemies/:threatLevel or /api/queries/procedure/doctor/:incarnation',
-        update: '/api/queries/update/enemy/:id/threat-level'
-      }
-    }
+    message: API_INFO.TITLE,
+    version: API_INFO.VERSION,
+    description: API_INFO.DESCRIPTION,
+    endpoints: API_INFO.ENDPOINTS
   });
 });
 
@@ -43,11 +38,11 @@ app.use('/api/episodes', episodesRouter);
 app.use('/api/queries', queriesRouter);
 app.use('/api/llm', llmRouter);
 
-// Error handling middleware
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ error: 'Something went wrong!' });
-});
+// 404 handler for unmatched routes
+app.use(notFoundHandler);
+
+// Global error handling middleware
+app.use(errorHandler);
 
 // Start server
 async function startServer() {

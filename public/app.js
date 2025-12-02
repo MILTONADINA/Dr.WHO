@@ -23,7 +23,8 @@ window.addEventListener('load', () => {
 async function loadDoctors() {
     try {
         const response = await fetch(`${API_BASE}/doctors`);
-        const doctors = await response.json();
+        const result = await response.json();
+        const doctors = result.data || result; // Handle both old and new format
         const list = document.getElementById('doctors-list');
         list.innerHTML = doctors.map(doctor => `
             <div class="data-card">
@@ -132,7 +133,8 @@ async function deleteDoctor(id) {
 async function loadEpisodes() {
     try {
         const response = await fetch(`${API_BASE}/episodes`);
-        const episodes = await response.json();
+        const result = await response.json();
+        const episodes = result.data || result; // Handle both old and new format
         const list = document.getElementById('episodes-list');
         list.innerHTML = episodes.map(episode => `
             <div class="data-card">
