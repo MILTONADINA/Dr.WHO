@@ -210,17 +210,32 @@ class QueryService {
 
   // Query VIEW
   async queryDoctorEpisodeSummary() {
+    try {
     const [results] = await sequelize.query('SELECT * FROM doctor_episode_summary');
     return results;
+    } catch (error) {
+      if (error.message && error.message.includes("doesn't exist")) {
+        throw new Error('VIEW "doctor_episode_summary" does not exist. Please run: npm run db:objects');
+      }
+      throw error;
+    }
   }
 
   async queryEnemyAppearanceSummary() {
+    try {
     const [results] = await sequelize.query('SELECT * FROM enemy_appearance_summary');
     return results;
+    } catch (error) {
+      if (error.message && error.message.includes("doesn't exist")) {
+        throw new Error('VIEW "enemy_appearance_summary" does not exist. Please run: npm run db:objects');
+      }
+      throw error;
+    }
   }
 
   // Call STORED PROCEDURE
   async getEnemiesByThreatLevel(minThreatLevel) {
+    try {
     const results = await sequelize.query(
       'CALL GetEnemiesByThreatLevel(:minThreatLevel)',
       {
@@ -229,7 +244,17 @@ class QueryService {
       }
     );
     // MySQL stored procedures return results in a nested array
-    return results[0] || [];
+      // Results structure: [[rows], metadata]
+      if (Array.isArray(results) && results.length > 0) {
+        return Array.isArray(results[0]) ? results[0] : results;
+      }
+      return [];
+    } catch (error) {
+      if (error.message && (error.message.includes("doesn't exist") || error.message.includes("Unknown procedure"))) {
+        throw new Error('STORED PROCEDURE "GetEnemiesByThreatLevel" does not exist. Please run: npm run db:objects');
+      }
+      throw error;
+    }
   }
 
   async getEpisodesForDoctor(incarnationNumber) {

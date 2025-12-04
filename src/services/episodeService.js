@@ -17,12 +17,17 @@ class EpisodeService extends BaseService {
   }
 
   /**
-   * Get all episodes with related data, ordered by air date
+   * Get all episodes with related data, ordered by air date (episodes with dates first, then by episode_id)
    */
   async getAllEpisodes() {
-    return this.getAll({ 
+    const { Sequelize } = require('sequelize');
+    return this.getAll({
       include: this.defaultIncludes,
-      order: [['air_date', 'ASC']]
+      order: [
+        [Sequelize.literal('CASE WHEN air_date IS NULL THEN 1 ELSE 0 END'), 'ASC'],
+        ['air_date', 'ASC'],
+        ['episode_id', 'ASC']
+      ]
     });
   }
 

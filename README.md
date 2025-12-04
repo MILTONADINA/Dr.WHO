@@ -13,8 +13,8 @@ A Doctor Who database system with 16 tables, REST API, and web interface. Built 
 - **Backend:** Node.js, Express.js
 - **ORM:** Sequelize
 - **Database:** MySQL
-- **Frontend:** HTML, CSS, JavaScript 
-- **LLM Integration:** OpenAI API 
+- **Frontend:** HTML, CSS, JavaScript
+- **LLM Integration:** OpenAI API
 
 ## Project Structure
 
@@ -30,7 +30,6 @@ A Doctor Who database system with 16 tables, REST API, and web interface. Built 
 │   │   ├── sync-db.js            # Database sync script
 │   │   ├── seed-db.js            # Database seeding script
 │   │   ├── create-db-objects.js  # Create VIEWs and STORED PROCEDUREs
-│   │   ├── import-large-dataset.js # Import 2000+ rows (extra credit)
 │   │   └── verify-setup.js        # Verify setup configuration
 │   └── server.js                  # Express server entry point
 ├── public/                        # Frontend files (extra credit)
@@ -98,6 +97,7 @@ DB_PORT=3306
 PORT=3000
 NODE_ENV=development
 OPENAI_API_KEY=your_openai_api_key_here  # For extra credit 7b
+DOCTOR_WHO_QUOTES_API=http://localhost:8000  # Optional: For catchphrases (see setup below)
 ```
 
 ### 3. Create Database
@@ -121,13 +121,33 @@ npm run db:objects
 ```
 
 
-### 6. Add Sample Data
+### 6. (Optional) Setup Doctor Who Quotes API for Catchphrases
+
+To enable catchphrases for doctors, you can run the Doctor Who Quotes API locally:
+
+```bash
+# Clone the repository
+git clone https://github.com/parulj3795/DoctorWhoQuotes.git
+cd DoctorWhoQuotes
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Run the API server
+uvicorn app.main:app --reload
+```
+
+The API will run at `http://localhost:8000`. The seed script will automatically use it if available.
+
+Alternatively, set `DOCTOR_WHO_QUOTES_API` in your `.env` file to point to a different URL.
+
+### 7. Add Sample Data
 
 ```bash
 npm run db:seed
 ```
 
-### 7. Run the Server
+### 8. Run the Server
 
 ```bash
 npm start
@@ -226,7 +246,7 @@ Server runs at `http://localhost:3000`
 
 ## Extra Credit Features
 
-### 7a: GUI Frontend with CRUD Operations 
+### 7a: GUI Frontend with CRUD Operations
 
 A web interface is available at `http://localhost:3000` (when frontend is implemented) that allows:
 - Viewing all doctors and episodes
@@ -234,7 +254,7 @@ A web interface is available at `http://localhost:3000` (when frontend is implem
 - Updating existing records
 - Deleting records
 
-### 7b: LLM Natural Language Queries 
+### 7b: LLM Natural Language Queries
 
 The frontend includes an LLM integration that allows users to ask natural language questions about the database, such as:
 - "Which Doctor had the most companions?"
@@ -242,7 +262,7 @@ The frontend includes an LLM integration that allows users to ask natural langua
 - "List all enemies with threat level above 8"
 
 
-### 7c: Online Deployment 
+### 7c: Online Deployment
 
 The application is configured for deployment on platforms like:
 - Heroku
@@ -254,13 +274,24 @@ See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed deployment instructions.
 
 ### 7d: Large Dataset (2000+ rows) (+6%)
 
-A script is provided to import a large dataset (2000+ rows). Run:
+The database seeding script (`npm run db:seed`) automatically imports 2000+ rows of legitimate data from external APIs:
 
-```bash
-npm run db:import-large
-```
+- **TVMaze API**: Episodes, seasons, actors, cast information
+- **Wikidata SPARQL**: Doctors, companions with exact incarnation numbers
+- **TARDIS Wiki API**: Planets, species, enemies, characters
+- **Wikidata Search API**: Writers and directors
 
-This will generate and import 2000+ rows across all tables. Make sure you've run `npm run db:seed` first to create the base data.
+The seed script fetches real data from these APIs and populates the database with:
+- 869+ episodes across 41 seasons
+- 200+ actors
+- 15 doctors with verified catchphrases
+- 60+ companions
+- 200+ planets
+- 200+ species
+- 200+ enemies
+- And more...
+
+**Total: 2000+ rows of legitimate API-sourced data**
 
 ## Testing the API
 

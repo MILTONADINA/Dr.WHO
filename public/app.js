@@ -26,19 +26,36 @@ async function loadDoctors() {
         const result = await response.json();
         const doctors = result.data || result; // Handle both old and new format
         const list = document.getElementById('doctors-list');
-        list.innerHTML = doctors.map(doctor => `
+        list.innerHTML = doctors.map(doctor => {
+            // Get season information from first or last episode
+            const firstSeason = doctor.firstEpisode?.season?.series_number || null;
+            const lastSeason = doctor.lastEpisode?.season?.series_number || null;
+            const seasonRange = firstSeason && lastSeason
+                ? (firstSeason === lastSeason ? `Season ${firstSeason}` : `Seasons ${firstSeason}-${lastSeason}`)
+                : (firstSeason ? `Season ${firstSeason}` : (lastSeason ? `Season ${lastSeason}` : 'N/A'));
+
+            // Character name is always "The Doctor" (or "Doctor" for short)
+            const characterName = 'The Doctor';
+
+            return `
             <div class="data-card">
                 <div>
-                    <h3>Doctor #${doctor.incarnation_number}</h3>
+                    <h3>${characterName} #${doctor.incarnation_number}</h3>
+                    <p><strong>Character:</strong> ${characterName}</p>
                     <p><strong>Actor:</strong> ${doctor.actor?.name || 'N/A'}</p>
+                    <p><strong>Incarnation Number:</strong> ${doctor.incarnation_number || 'N/A'}</p>
+                    <p><strong>Season(s):</strong> ${seasonRange}</p>
                     <p><strong>Catchphrase:</strong> ${doctor.catchphrase || 'N/A'}</p>
+                    <p><strong>First Episode:</strong> ${doctor.firstEpisode?.title || `ID: ${doctor.first_episode_id || 'N/A'}`}</p>
+                    <p><strong>Last Episode:</strong> ${doctor.lastEpisode?.title || `ID: ${doctor.last_episode_id || 'N/A'}`}</p>
                 </div>
                 <div class="data-actions">
                     <button class="btn btn-secondary" onclick="editDoctor(${doctor.doctor_id})">Edit</button>
                     <button class="btn btn-danger" onclick="deleteDoctor(${doctor.doctor_id})">Delete</button>
                 </div>
             </div>
-        `).join('');
+        `;
+        }).join('');
     } catch (error) {
         document.getElementById('doctors-list').innerHTML = `<div class="error">Error loading doctors: ${error.message}</div>`;
     }
@@ -68,7 +85,7 @@ function showDoctorForm(doctor = null) {
             </div>
             <div class="form-group">
                 <label>First Episode ID</label>
-                <input type="number" name="first_episode_id" value="${doctor?.first_episode_id || ''}"
+                <input type="number" name="first_episode_id" value="${doctor?.first_episode_id ?? ''}"
                        placeholder="e.g., 1 (optional)"
                        title="Episode where this Doctor first appeared"
                        min="1">
@@ -76,7 +93,7 @@ function showDoctorForm(doctor = null) {
             </div>
             <div class="form-group">
                 <label>Last Episode ID</label>
-                <input type="number" name="last_episode_id" value="${doctor?.last_episode_id || ''}"
+                <input type="number" name="last_episode_id" value="${doctor?.last_episode_id ?? ''}"
                        placeholder="e.g., 10 (optional)"
                        title="Episode where this Doctor last appeared"
                        min="1">
@@ -140,7 +157,10 @@ function showDoctorForm(doctor = null) {
 function editDoctor(id) {
     fetch(`${API_BASE}/doctors/${id}`)
         .then(r => r.json())
-        .then(doctor => showDoctorForm(doctor))
+        .then(result => {
+            const doctor = result.data || result; // Handle both response formats
+            showDoctorForm(doctor);
+        })
         .catch(err => alert('Error loading doctor: ' + err.message));
 }
 
@@ -215,9 +235,14 @@ function applyEpisodesFilter() {
         ${filteredEpisodes.map(episode => `
             <div class="data-card">
                 <div>
-                    <h3>${episode.title}</h3>
+                    <h3>${episode.title}${episode.episode_number ? ` (Episode #${episode.episode_number})` : ''}</h3>
+                    <p><strong>Season ID:</strong> ${episode.season_id || 'N/A'}</p>
                     <p><strong>Season:</strong> ${episode.season?.series_number || 'N/A'}</p>
-                    <p><strong>Air Date:</strong> ${episode.air_date || 'N/A'}</p>
+                    <p><strong>Episode Number:</strong> ${episode.episode_number || 'N/A'}</p>
+                    <p><strong>Title:</strong> ${episode.title || 'N/A'}</p>
+                    <p><strong>Writer ID:</strong> ${episode.writer_id || 'N/A'}</p>
+                    <p><strong>Director ID:</strong> ${episode.director_id || 'N/A'}</p>
+                    <p><strong>Air Date:</strong> ${episode.air_date ? new Date(episode.air_date).toLocaleDateString() : 'Not scheduled'}</p>
                     <p><strong>Runtime:</strong> ${episode.runtime_minutes || 'N/A'} minutes</p>
                 </div>
                 <div class="data-actions">
@@ -257,7 +282,7 @@ function showEpisodeForm(episode = null) {
             </div>
             <div class="form-group">
                 <label>Writer ID</label>
-                <input type="number" name="writer_id" value="${episode?.writer_id || ''}"
+                <input type="number" name="writer_id" value="${episode?.writer_id ?? ''}"
                        placeholder="e.g., 1 (optional)"
                        title="Writer who wrote this episode"
                        min="1">
@@ -265,7 +290,7 @@ function showEpisodeForm(episode = null) {
             </div>
             <div class="form-group">
                 <label>Director ID</label>
-                <input type="number" name="director_id" value="${episode?.director_id || ''}"
+                <input type="number" name="director_id" value="${episode?.director_id ?? ''}"
                        placeholder="e.g., 1 (optional)"
                        title="Director who directed this episode"
                        min="1">
@@ -273,7 +298,7 @@ function showEpisodeForm(episode = null) {
             </div>
             <div class="form-group">
                 <label>Episode Number</label>
-                <input type="number" name="episode_number" value="${episode?.episode_number || ''}"
+                <input type="number" name="episode_number" value="${episode?.episode_number ?? ''}"
                        placeholder="e.g., 1 (within season)"
                        title="Episode number within the season"
                        min="1" max="20">
@@ -281,18 +306,18 @@ function showEpisodeForm(episode = null) {
             </div>
             <div class="form-group">
                 <label>Air Date</label>
-                <input type="date" name="air_date" value="${episode?.air_date || ''}"
+                <input type="date" name="air_date" value="${episode?.air_date ?? ''}"
                        title="Date when the episode first aired"
                        min="1963-11-23" max="2030-12-31">
                 <small class="help-text">Optional: Original broadcast date</small>
             </div>
             <div class="form-group">
                 <label>Runtime (minutes)</label>
-                <input type="number" name="runtime_minutes" value="${episode?.runtime_minutes || ''}"
+                <input type="number" name="runtime_minutes" value="${episode?.runtime_minutes ?? '45'}"
                        placeholder="e.g., 45 (typical runtime)"
                        title="Episode duration in minutes"
                        min="1" max="180">
-                <small class="help-text">Optional: Episode duration (1-180 minutes)</small>
+                <small class="help-text">Optional: Episode duration (1-180 minutes). Default: 45</small>
             </div>
             <div class="form-actions">
                 <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
@@ -344,7 +369,10 @@ function showEpisodeForm(episode = null) {
 function editEpisode(id) {
     fetch(`${API_BASE}/episodes/${id}`)
         .then(r => r.json())
-        .then(episode => showEpisodeForm(episode))
+        .then(result => {
+            const episode = result.data || result; // Handle both response formats
+            showEpisodeForm(episode);
+        })
         .catch(err => alert('Error loading episode: ' + err.message));
 }
 

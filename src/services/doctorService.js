@@ -4,15 +4,23 @@
  */
 
 const BaseService = require('./BaseService');
-const { Doctor, Actor, Episode } = require('../models');
+const { Doctor, Actor, Episode, Season } = require('../models');
 
 class DoctorService extends BaseService {
   constructor() {
     super(Doctor, 'Doctor');
     this.defaultIncludes = [
       { model: Actor, as: 'actor' },
-      { model: Episode, as: 'firstEpisode' },
-      { model: Episode, as: 'lastEpisode' }
+      {
+        model: Episode,
+        as: 'firstEpisode',
+        include: [{ model: Season, as: 'season' }]
+      },
+      {
+        model: Episode,
+        as: 'lastEpisode',
+        include: [{ model: Season, as: 'season' }]
+      }
     ];
   }
 

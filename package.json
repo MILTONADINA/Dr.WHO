@@ -9,9 +9,7 @@
     "verify": "node src/scripts/verify-setup.js",
     "db:sync": "node src/scripts/sync-db.js",
     "db:seed": "node src/scripts/seed-db.js",
-    "db:objects": "node src/scripts/create-db-objects.js",
-    "db:reset": "node src/scripts/reset-db.js",
-    "db:import-large": "node src/scripts/import-large-dataset.js"
+    "db:objects": "node src/scripts/create-db-objects.js"
   },
   "keywords": ["doctor-who", "database", "sequelize", "express"],
   "author": "Jonathan Muhire, Milton Adina, Magnani Fabiola",
